@@ -1,0 +1,42 @@
+{
+  "name": "my-express-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:rust": "cd rust-crypto-analyzer && npm run build",
+    "build:all": "npm run build:rust && npm run build && cd frontend && npm run build",
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts",
+    "dev:ts": "ts-node src/app.ts",
+    "frontend": "cd frontend && npm start",
+    "backend": "nodemon src/app.ts",
+    "dev:all": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "dev:full": "concurrently -n \"API,React\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
+    "install:all": "npm install && cd frontend && npm install && cd ../rust-crypto-analyzer && npm install",
+    "postinstall": "npm run build:rust",
+    "test:security": "node -e \"const crypto = require('./rust-crypto-analyzer'); console.log('Testing Rust module...'); crypto.analyzePasswordSecurity('test123').then(console.log);\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/pg": "^8.15.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "crypto-analyzer",
+  "version": "0.1.0",
+  "description": "High-performance password security analyzer built with Rust",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "artifacts": "napi artifacts",
+    "version": "napi version"
+  },
+  "napi": {
+    "name": "crypto-analyzer",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-pc-windows-msvc",
+        "aarch64-apple-darwin",
+        "x86_64-unknown-linux-gnu"
+      ]
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.2.3"
+  },
+  "engines": {
+    "node": ">= 10"
+  }
+}
