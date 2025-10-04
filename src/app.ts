@@ -162,3 +162,38 @@ app.get('/users/:id', (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+
+/*
+
+### Public Endpoints
+
+**POST /register**
+```bash
+curl -X POST http://localhost:3000/register \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Doe", "email": "john@example.com", "password": "SecurePass123!"}'
+```
+
+**POST /login**
+```bash
+curl -X POST http://localhost:3000/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "john@example.com", "password": "SecurePass123!"}'
+```
+
+**POST /check-password** (Test password security)
+```bash
+curl -X POST http://localhost:3000/check-password \
+  -H "Content-Type: application/json" \
+  -d '{"password": "TestPassword123!"}'
+```
+
+### Protected Endpoints (Require JWT Token)
+
+**GET /profile**
+```bash
+curl http://localhost:3000/profile \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+*/

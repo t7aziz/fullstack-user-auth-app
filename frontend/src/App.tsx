@@ -21,7 +21,6 @@ function App() {
     password: ''
   });
 
-  // SHOULD NOT USE THIS PORT USE 3001 INSTEAD
   const API_BASE = 'http://localhost:3001';
 
   // Check if user is logged in on app start
