@@ -122,7 +122,6 @@ npm start
 ## WIP 
 
 - [ ] Rate limiting with Redis
-- [ ] Add more endpoints for other operations
 - [ ] Docker containerization
 - [ ] SHA for hashing large files using Rust
 - [ ] WebSocket real-time features?
