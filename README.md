@@ -27,26 +27,26 @@ A modern full-stack application for user management, including registering and l
 - PostgreSQL
 
 ## Performance Comparisons
-Password Hashing Performance Benchmark
-======================================
-100 passwords:
---------------------------------------------------------------------------------
-Node bcrypt (10 rounds):       5.10s
-Node Argon2:                   4.39s
-Rust Argon2 (sequential):      1.61s
-Rust Argon2 (parallel):        0.56s
+
+### Password Hashing Performance Benchmark
+
+#### 100 passwords:
+
+Node bcrypt (10 rounds):       5.10s\
+Node Argon2:                   4.39s\
+Rust Argon2 (sequential):      1.61s\
+Rust Argon2 (parallel):        0.56s\
 Rust parallel speedup: 2.89x faster than sequential, 7.86x faster than Node
-1000 passwords:
---------------------------------------------------------------------------------
-Node bcrypt (10 rounds):       50.20s
-Node Argon2:                   44.29s
-Rust Argon2 (sequential):      16.12s
-Rust Argon2 (parallel):        5.57s
+
+#### 1000 passwords:
+
+Node bcrypt (10 rounds):       50.20s\
+Node Argon2:                   44.29s\
+Rust Argon2 (sequential):      16.12s\
+Rust Argon2 (parallel):        5.57s\
 Rust parallel speedup: 2.89x faster than sequential, 7.95x faster than Node
 
-Key Insights
-================================================================================
-Rust parallel processing shows ~8.0x speedup for batch operations
+Key Insights: Rust parallel processing shows ~8.0x speedup for batch operations
 
 ## Prerequisites
 
