@@ -1,10 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import cryptoAnalyzer from '../rust-crypto-analyzer';
 import pool from './db'; 
-import dotenv from 'dotenv';
-dotenv.config();
 
 const app = express();
 const port = parseInt(process.env.PORT || '3000', 10);
@@ -39,7 +40,7 @@ const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) 
 };
 
 // API routes (passwords are dealt with in the rust module)
-app.post('/register', async (req: Request, res: Response) => {
+app.post('/api/users', async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
@@ -59,7 +60,7 @@ app.post('/register', async (req: Request, res: Response) => {
     // Check if user exists in the database (should not return 'user with this email alr exists due to security)
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
-      return res.status(400).json({ error: 'User with this email already exists' });
+      return res.status(409).json({ error: 'User with this email already exists' });
     }
 
     const hashedPassword = cryptoAnalyzer.hashPassword(password);
@@ -135,28 +136,48 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// Needs to be fixed to actually use db
-app.get('/profile', authenticateToken, (req: AuthRequest, res: Response) => {
-  res.json({
-    message: 'Protected route accessed',
-    user: req.user
-  });
-});
+// Gets logged in user's profile
+app.get('/api/profile', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    // We query the DB to get the freshest data, as the JWT data could be stale.
+    const result = await pool.query(
+      'SELECT id, name, email, created_at FROM users WHERE id = $1',
+      [userId]
+    );
 
-// Needs to be fixed to actually use db
-app.get('/users/:id', (req: Request, res: Response) => {
-  const userId = req.params.id;
-  res.json({ 
-    message: `Getting user with ID: ${userId}`,
-    user: {
-      id: userId,
-      name: 'John Doe',
-      email: 'john@example.com'
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  });
+
+    res.json({ user: result.rows[0] });
+
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Other Routes (PUT, DELETE, etc) (WIP)
+// Get specific user by ID
+app.get('/api/users/:id', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    // select specific columns to avoid ever sending back the password hash.
+    const result = await pool.query(
+        'SELECT id, name, email, created_at FROM users WHERE id = $1',
+        [id]
+    );
+
+    if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ user: result.rows[0] });
+  } catch (error) {
+      console.error(`Error fetching user ${req.params.id}:`, error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Should list API methods
 app.listen(port, () => {

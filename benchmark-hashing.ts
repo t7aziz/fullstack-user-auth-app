@@ -1,4 +1,3 @@
-// benchmark-hashing.ts
 import { performance } from 'perf_hooks';
 import bcrypt from 'bcrypt';
 import argon2 from 'argon2';
