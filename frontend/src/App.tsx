@@ -21,7 +21,7 @@ function App() {
     password: ''
   });
 
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = 'http://localhost:3000';
 
   // Check if user is logged in on app start
   useEffect(() => {
@@ -32,7 +32,7 @@ function App() {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch(`${API_BASE}/profile`, {
+      const response = await fetch(`${API_BASE}/api/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ function App() {
     setLoading(true);
     setError('');
 
-    const endpoint = isLogin ? '/login' : '/register';
+    const endpoint = isLogin ? '/login' : '/api/users';
     const body = isLogin 
       ? { email: formData.email, password: formData.password }
       : formData;
@@ -82,7 +82,7 @@ function App() {
         setError(data.error || 'Something went wrong');
       }
     } catch (err) {
-      setError('Network error? Make sure the server is running.');
+      setError('Network error. Make sure the server is running.');
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Express + React + Rust Module Auth Demo</h1>
+        <h1>Express + React Auth Demo</h1>
         
         <div className="auth-container">
           <div className="auth-toggle">
