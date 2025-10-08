@@ -57,6 +57,27 @@ function App() {
     setLoading(true);
     setError('');
 
+    // Validate email
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address.');
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      setLoading(false);
+      return;
+    }
+
+    // Additional check: if registering, ensure the full name is provided
+    if (!isLogin && formData.name.trim() === '') {
+      setError('Full name is required for registration.');
+      setLoading(false);
+      return;
+    }
+
     const endpoint = isLogin ? '/login' : '/api/users';
     const body = isLogin 
       ? { email: formData.email, password: formData.password }
@@ -82,6 +103,7 @@ function App() {
         setError(data.error || 'Something went wrong');
       }
     } catch (err) {
+      console.error('Error submitting form:', err);
       setError('Network error. Make sure the server is running.');
     } finally {
       setLoading(false);
