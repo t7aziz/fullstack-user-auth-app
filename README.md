@@ -1,6 +1,6 @@
 # Full-Stack Authentication Platform with Rust Integration
 
-A modern full-stack application for user management, including registering and logging in with email + password. Node.js + Express backend with PostgreSQL database and React frontend, featuring high-performance password security analysis and hashing powered by Rust.
+A modern full-stack application for user management, including registering and logging in with email + password. Node.js + Express backend with PostgreSQL database and React frontend written in TypeScript, and also featuring high-performance password security analysis and hashing via Rust.
 
 ## Features
 
@@ -13,18 +13,9 @@ A modern full-stack application for user management, including registering and l
 - **Modern Database**: User data and password hashes secured in PostgreSQL database
 - **Production Ready**: Rate limiting, CORS, REST, ACID
 
-## Tech Stack
-
-### Backend
-- Node.js + Express.js (TypeScript)
-- Rust (via NAPI-RS) for performance-critical operations
-
-### Frontend
-- React (TypeScript)
-- HTML/CSS
-
-### Database
-- PostgreSQL
+## Screenshots
+![Login/Register Page](screenshots/s1.png)
+![Account Page](screenshots/s2.png)
 
 ## Performance Comparisons
 
@@ -94,7 +85,7 @@ JWT_SECRET=
 ### 3. Build Everything
 
 ```bash
-npm run build:all
+npm run build
 ```
 
 ## Running the Application
@@ -102,7 +93,7 @@ npm run build:all
 ### Development Mode (Both servers with hot reload)
 
 ```bash
-npm run dev:full
+npm run dev
 ```
 
 This starts:
@@ -113,7 +104,7 @@ This starts:
 
 ```bash
 # Build everything
-npm run build:all
+npm run build
 
 # Start backend
 npm start

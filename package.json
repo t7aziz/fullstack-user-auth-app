@@ -10,7 +10,7 @@
     "build:ui": "cd frontend && npm run build",
     "build": "npm run build:rust && npm run build:server && npm run build:ui",
     "start": "node dist/app.js",
-    "dev:server": "nodemon --respawn --transpile-only src/app.ts",
+    "dev:server": "nodemon --watch src --ext ts --exec ts-node src/app.ts",
     "dev:ui": "cd frontend && npm start",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:ui\""
   },
