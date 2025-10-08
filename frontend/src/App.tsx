@@ -122,7 +122,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Express + React Auth Demo</h1>
+        <h1>PERN Stack + Rust Auth Demo</h1>
         
         <div className="auth-container">
           <div className="auth-toggle">

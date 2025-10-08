@@ -7,6 +7,10 @@ import cors from 'cors';
 import cryptoAnalyzer from '../rust-crypto-analyzer';
 import pool from './db'; 
 
+const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+};
 const app = express();
 const port = parseInt(process.env.PORT || '3000', 10);
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -17,6 +21,7 @@ if (!JWT_SECRET) {
 
 app.use(express.json());
 app.use(cors());
+app.use(loggerMiddleware);
 
 interface AuthRequest extends Request {
   user?: { id: string; email: string; name: string };
@@ -183,38 +188,3 @@ app.get('/api/users/:id', authenticateToken, async (req: Request, res: Response)
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
-
-/*
-
-### Public Endpoints
-
-**POST /register**
-```bash
-curl -X POST http://localhost:3000/register \
-  -H "Content-Type: application/json" \
-  -d '{"name": "John Doe", "email": "john@example.com", "password": "SecurePass123!"}'
-```
-
-**POST /login**
-```bash
-curl -X POST http://localhost:3000/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "john@example.com", "password": "SecurePass123!"}'
-```
-
-**POST /check-password** (Test password security)
-```bash
-curl -X POST http://localhost:3000/check-password \
-  -H "Content-Type: application/json" \
-  -d '{"password": "TestPassword123!"}'
-```
-
-### Protected Endpoints (Require JWT Token)
-
-**GET /profile**
-```bash
-curl http://localhost:3000/profile \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
-```
-
-*/
