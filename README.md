@@ -1,6 +1,6 @@
 # Full-Stack Authentication Platform with Rust Integration
 
-A modern full-stack application for user management, including registering and logging in with email + password. Node.js + Express backend with PostgreSQL database and React frontend written in TypeScript, and also featuring high-performance password security analysis and hashing via Rust.
+A modern full-stack application for user management, including registering and logging in with email + password. Node.js + Express backend with PostgreSQL database and React frontend written in TypeScript, and also featuring high-performance password security analysis and hashing via Rust. Docker containerization included.
 
 ## Features
 
@@ -46,31 +46,18 @@ Key Insights: Rust parallel processing shows ~8.0x speedup for batch operations
 - npm or yarn
 - Git
   
-## Installation
+## Setup Instructions
 
-### 1. Install Rust
-
-**Windows:**
-Download and run https://rustup.rs/ (rustup-init.exe)
-
-**macOS/Linux:**
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-
-### 2. Clone and Install Dependencies
+### 1. Clone Repository
 
 ```bash
 git clone https://github.com/t7aziz/fullstack-user-auth-app.git
 cd fullstack-user-auth-app
-
-# Install all dependencies (backend, frontend, and Rust module)
-npm run install:all
 ```
 
-### 3. Environment Variables
+### 2. Environment Variables
 
-Create a `.env` file in the root directory and fill in the needed variables:
+Copy the `.env.example` file to a new `.env` file and fill in the needed variables:
 
 ```env
 DB_USER=
@@ -82,15 +69,34 @@ PORT=3000
 JWT_SECRET=
 ```
 
-### 3. Build Everything
+### 3. Run with Docker
 
 ```bash
+docker-compose up --build
+```
+
+### 4. (Alternative to Docker) Install Locally and Run
+
+#### Install Rust
+
+**Windows:**
+Download and run https://rustup.rs/ (rustup-init.exe)
+
+**macOS/Linux:**
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Also add .cargo/bin to your PATH
+
+#### Install Dependencies and build
+
+```bash
+npm run install:all
 npm run build
 ```
 
-## Running the Application
-
-### Development Mode (Both servers with hot reload)
+#### Run
 
 ```bash
 npm run dev
@@ -100,20 +106,16 @@ This starts:
 - Backend API on http://localhost:3000
 - Frontend on http://localhost:3001
 
-### Production Mode
+##### Production Mode
 
 ```bash
-# Build everything
-npm run build
-
-# Start backend
 npm start
 ```
 
 ## WIP 
 
 - [ ] Rate limiting with Redis
-- [ ] Docker containerization
+- [✓] Docker containerization
 - [ ] SHA for hashing large files using Rust
 - [ ] WebSocket real-time features?
 - [ ] Deploy somewhere?
