@@ -1,0 +1,42 @@
+# Stage 1: Builder for Nodejs and Rust
+FROM node:20-slim as builder
+WORKDIR /usr/src/app
+
+# 1. Install Rust and build essentials
+RUN apt-get update && apt-get install -y curl build-essential && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# 2. Add the Cargo bin directory to the shell's PATH
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Copy all necessary files for the build
+COPY package.json package-lock.json ./
+COPY tsconfig.json ./.
+COPY src ./src
+COPY rust-crypto-analyzer /usr/src/app/rust-crypto-analyzer
+
+# Install all dependencies
+RUN npm install
+
+# Build the Rust module and the TypeScript server
+RUN npm run build:rust
+RUN npm run build:server
+
+# Remove development dependencies
+RUN npm prune --production
+
+# Stage 2: Runner
+FROM node:20-slim as runner
+WORKDIR /usr/src/app
+
+# Copy production dependencies and main package file
+COPY package.json package-lock.json ./
+COPY .env.example ./.env.example
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/rust-crypto-analyzer/package.json ./rust-crypto-analyzer/
+COPY --from=builder /usr/src/app/rust-crypto-analyzer/*.node ./rust-crypto-analyzer/
+COPY --from=builder /usr/src/app/rust-crypto-analyzer/index.js ./rust-crypto-analyzer/
+COPY --from=builder /usr/src/app/rust-crypto-analyzer/index.d.ts ./rust-crypto-analyzer/
+
+EXPOSE 3000
+CMD [ "npm", "start" ]

@@ -1,0 +1,51 @@
+services:
+  # 1. PostgreSQL Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # 2. Node.js/Rust Backend API Service
+  backend:
+    build:
+      context: . # Build context is the project root
+      dockerfile: Dockerfile.backend
+    container_name: user_auth_api
+    restart: always
+    environment:
+      # Inject environment variables from the host's .env file
+      DB_USER: ${DB_USER}
+      DB_HOST: db # Service name acts as the hostname
+      DB_DATABASE: ${DB_DATABASE}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: 5432
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db # Ensure the database starts before the backend
+    # Healthcheck to wait for the DB to be ready is highly recommended in production
+
+  # 3. React Frontend Service
+  frontend:
+    build:
+      context: ./frontend # Build context is the frontend subdirectory
+      dockerfile: Dockerfile.frontend
+    container_name: user_auth_frontend
+    restart: always
+    ports:
+      - "3001:80" # Map host port 3001 to container port 80 (Nginx default)
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
