@@ -1,16 +1,19 @@
-# Stage 1: Build Stage - Build the React application
+# Stage 1: Builder for React
 FROM node:18-alpine as builder
 WORKDIR /app
-COPY package.json .
+
 # Install dependencies for the frontend
+COPY package.json .
 RUN npm install
 COPY . .
+
 # Build the static assets
 RUN npm run build
 
-# Stage 2: Production Stage - Serve static assets with Nginx
+# Stage 2: Runner
 FROM nginx:alpine
-# Copy the built assets from the previous stage to the Nginx public directory
+
+# Copy built assets to the Nginx public directory
 COPY --from=builder /app/build /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

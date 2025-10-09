@@ -2,10 +2,10 @@
 FROM node:20-slim as builder
 WORKDIR /usr/src/app
 
-# 1. Install Rust and build essentials
+# Install Rust and build essentials
 RUN apt-get update && apt-get install -y curl build-essential && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
-# 2. Add the Cargo bin directory to the shell's PATH
+# Add the Cargo bin directory to the PATH
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Copy all necessary files for the build
