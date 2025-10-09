@@ -11,7 +11,7 @@ A modern full-stack application for user management, including registering and l
   - Argon2 hashing
 - **React Frontend**: Modern UI development with TypeScript
 - **Modern Database**: User data and password hashes secured in PostgreSQL database
-- **Production Ready**: Rate limiting, CORS, REST, ACID
+- **Production Ready**: CORS, REST, ACID
 
 ## Screenshots
 ![Login/Register Page](screenshots/s1.png)
