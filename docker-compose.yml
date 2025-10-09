@@ -1,5 +1,5 @@
 services:
-  # 1. PostgreSQL Database Service
+  # Database Service
   db:
     image: postgres:15-alpine
     container_name: postgres_db
@@ -13,7 +13,7 @@ services:
     ports:
       - "5432:5432"
 
-  # 2. Node.js/Rust Backend API Service
+  # Backend API Service
   backend:
     build:
       context: . # Build context is the project root
@@ -32,10 +32,9 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - db # Ensure the database starts before the backend
-    # Healthcheck to wait for the DB to be ready is highly recommended in production
+      - db 
 
-  # 3. React Frontend Service
+  # React Frontend Service
   frontend:
     build:
       context: ./frontend # Build context is the frontend subdirectory
