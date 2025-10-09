@@ -2,7 +2,7 @@ import { performance } from 'perf_hooks';
 import bcrypt from 'bcrypt';
 import argon2 from 'argon2';
 
-const cryptoAnalyzer = require('./rust-crypto-analyzer');
+const cryptoAnalyzer = require('../rust-crypto-analyzer');
 
 function generatePasswords(count: number): string[] {
   return Array.from({ length: count }, (_, i) => `Password${i}!SecureTest`);
