@@ -2,6 +2,7 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use argon2::password_hash::{rand_core::OsRng, SaltString};
+use sha1::{Digest, Sha1}; // for HIBP
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use rayon::prelude::*; // parallel iterator
@@ -110,6 +111,15 @@ pub fn batch_hash_passwords(passwords: Vec<String>) -> Result<HashMap<String, St
         .collect();
     
     Ok(results)
+}
+
+#[napi]
+// hash password with sha1 for Have I Been Pwned
+pub fn hash_password_sha1(password: String) -> Result<String> {
+    let mut hasher = Sha1::new();
+    hasher.update(password.as_bytes());
+    let result = hasher.finalize();
+    Ok(hex::encode(result).to_uppercase())
 }
 
 fn analyze_patterns(password: &str) -> PatternAnalysis {

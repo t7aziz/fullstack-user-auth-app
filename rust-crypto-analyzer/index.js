@@ -310,9 +310,10 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { checkPasswordPolicy, hashPassword, verifyPasswordHash, batchHashPasswords } = nativeBinding
+const { checkPasswordPolicy, hashPassword, verifyPasswordHash, batchHashPasswords, hashPasswordSha1 } = nativeBinding
 
 module.exports.checkPasswordPolicy = checkPasswordPolicy
 module.exports.hashPassword = hashPassword
 module.exports.verifyPasswordHash = verifyPasswordHash
 module.exports.batchHashPasswords = batchHashPasswords
+module.exports.hashPasswordSha1 = hashPasswordSha1

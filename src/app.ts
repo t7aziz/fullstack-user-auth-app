@@ -5,6 +5,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import cryptoAnalyzer from '../rust-crypto-analyzer';
+import { checkPasswordBreached } from './services/hibp';
 import pool from './db'; 
 
 const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -184,11 +185,32 @@ app.get('/api/users/:id', authenticateToken, async (req: Request, res: Response)
   }
 });
 
-app.get('/check-password-breach', authenticateToken, async (req: Request, res: Response) => {
+// NEW: HIBP
+app.post('/api/check-breach', async (req: Request, res: Response) => {
   try {
-
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+    
+    // Hash password with SHA-1 in Rust (fast!)
+    const passwordHash = cryptoAnalyzer.hashPasswordSha1(password);
+    
+    // Check against HIBP
+    const result = await checkPasswordBreached(passwordHash);
+    
+    res.json({
+      breached: result.breached,
+      breachCount: result.count,
+      message: result.breached 
+        ? `This password has been exposed in ${result.count.toLocaleString()} data breaches!`
+        : 'This password has not been found in any known data breaches.'
+    });
+    
   } catch (error) {
-
+    console.error('Breach check error:', error);
+    res.status(500).json({ error: 'Failed to check breach status' });
   }
 });
 
