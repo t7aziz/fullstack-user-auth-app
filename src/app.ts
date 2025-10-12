@@ -184,6 +184,14 @@ app.get('/api/users/:id', authenticateToken, async (req: Request, res: Response)
   }
 });
 
+app.get('/check-password-breach', authenticateToken, async (req: Request, res: Response) => {
+  try {
+
+  } catch (error) {
+
+  }
+});
+
 // Should list API methods
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
