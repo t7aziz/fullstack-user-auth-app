@@ -38,7 +38,12 @@ function App() {
           'Content-Type': 'application/json'
         }
       });
-
+      const hibp = await fetch(`${API_BASE}/api/check-breach`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);

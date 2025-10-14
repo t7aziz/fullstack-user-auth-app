@@ -185,7 +185,7 @@ app.get('/api/users/:id', authenticateToken, async (req: Request, res: Response)
   }
 });
 
-// NEW: HIBP
+// NEW: HIBP Need to change this so that the frontend isn't passing the password through, should take userid or something and check the database
 app.post('/api/check-breach', async (req: Request, res: Response) => {
   try {
     const { password } = req.body;
