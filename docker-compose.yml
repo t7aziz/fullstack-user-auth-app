@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./src/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "5432:5432"
 
@@ -23,7 +24,7 @@ services:
     environment:
       # Inject environment variables from the host's .env file
       DB_USER: ${DB_USER}
-      DB_HOST: db # Service name acts as the hostname
+      DB_HOST: db # Overrides localhost when deployed
       DB_DATABASE: ${DB_DATABASE}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: 5432

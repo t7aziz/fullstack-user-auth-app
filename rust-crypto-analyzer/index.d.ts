@@ -21,6 +21,7 @@ export interface PatternAnalysis {
   sequentialChars: number
 }
 export declare function checkPasswordPolicy(password: string): PasswordAnalysis
+/** Hashes a password securely using Argon2 */
 export declare function hashPassword(password: string): string
 export declare function verifyPasswordHash(password: string, hash: string): boolean
 export declare function batchHashPasswords(passwords: Array<string>): Record<string, string>
