@@ -1,35 +1,35 @@
 import axios from 'axios';
 
-const HIBP_API = 'https://api.pwnedpasswords.com/range/';
+export async function checkPasswordBreached(sha1: string) {
+    const prefix = sha1.slice(0, 5).toUpperCase();
+    const suffix = sha1.slice(5).toUpperCase();
+    const url = `https://api.pwnedpasswords.com/range/${prefix}`;
 
-export async function checkPasswordBreached(passwordHash: string): Promise<{ breached: boolean; count: number }> {
     try {
-        const prefix = passwordHash.substring(0, 5);
-        const suffix = passwordHash.substring(5);
-        
-        // Query HIBP API
-        const response = await axios.get(`${HIBP_API}${prefix}`, {
+        const res = await axios.get<string>(url, {
             headers: {
-                'User Agent': 'YourApp-PasswordChecker',
+                'User-Agent': 'my-express-app',
                 'Add-Padding': 'true'
-            }
+            },
+            responseType: 'text'
         });
 
-        const hashes = response.data.split('\n');
-
-        for (const line of hashes) {
-            const [hashSuffix, count] = line.split(':');
-            if (hashSuffix.trim().toUpperCase() === suffix.toUpperCase()) {
-                return {
-                    breached: true,
-                    count: parseInt(count.trim(), 10)
-                }
-            }
+        const lines = res.data.split(/\r?\n/);
+        const match = lines.find(line => line.startsWith(suffix));
+        console.log(`lines: ${lines}, match: ${match}`);
+        if (!match) {
+            console.log("Breached: false, count: 0");
+            return { breached: false, count: 0 };
         }
 
-        return {breached: false, count: 0};
-    } catch (error) {
-        console.error('HIBP API error:', error);
+        const parts = match.split(':');
+        const count = Number(parts[1]) || 0;
+
+        console.log(`Breached: true, count: ${count}`);
+        return { breached: true, count };
+    } catch (err) {
+        console.error('HIBP API error:', err);
+        // bubble a clear error for callers to handle
         throw new Error('Failed to check password breach status');
     }
 }

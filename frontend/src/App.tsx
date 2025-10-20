@@ -13,6 +13,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [breachStatus, setBreachStatus] = useState<{ breached: boolean; count: number | null } | null>(null);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -61,6 +62,7 @@ function App() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setBreachStatus(null);
 
     // Validate email
     if (!formData.email.includes('@')) {
@@ -84,7 +86,7 @@ function App() {
     }
 
     const endpoint = isLogin ? '/login' : '/api/users';
-    const body = isLogin 
+    const body = isLogin
       ? { email: formData.email, password: formData.password }
       : formData;
 
@@ -104,6 +106,12 @@ function App() {
         setToken(data.token);
         setUser(data.user);
         setFormData({ name: '', email: '', password: '' });
+
+        if (!isLogin && data.breach !== undefined) {
+          setBreachStatus({ breached: !!data.breach, count: data.breachCount ?? null });
+        } else if (isLogin && data.breach !== undefined) {
+          setBreachStatus({ breached: !!data.breach, count: data.breachCount ?? null });
+        }
       } else {
         setError(data.error || 'Something went wrong');
       }
@@ -134,6 +142,13 @@ function App() {
       <div className="App">
         <header className="App-header">
           <h1>Welcome, {user.name}!</h1>
+          {breachStatus && (
+            <div className={`breach-status ${breachStatus.breached ? 'breached' : 'secure'}`}>
+              {breachStatus.breached
+                ? `Password breached: seen ${breachStatus.count?.toLocaleString() ?? 'an unknown number of'} times (HIBP)`
+                : 'Password secure: not found in known breaches (HIBP)'}
+            </div>
+          )}
           <div className="user-info">
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>ID:</strong> {user.id}</p>
@@ -149,18 +164,17 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>PERN Stack + Rust Auth Demo</h1>
-        
+        <h1>PERN Stack + Rust User Auth Demo</h1>
         <div className="auth-container">
           <div className="auth-toggle">
-            <button 
-              onClick={() => setIsLogin(true)} 
+            <button
+              onClick={() => setIsLogin(true)}
               className={isLogin ? 'active' : ''}
             >
               Login
             </button>
-            <button 
-              onClick={() => setIsLogin(false)} 
+            <button
+              onClick={() => setIsLogin(false)}
               className={!isLogin ? 'active' : ''}
             >
               Register
@@ -178,7 +192,7 @@ function App() {
                 required
               />
             )}
-            
+
             <input
               type="email"
               name="email"
@@ -187,7 +201,7 @@ function App() {
               onChange={handleInputChange}
               required
             />
-            
+
             <input
               type="password"
               name="password"
@@ -196,7 +210,7 @@ function App() {
               onChange={handleInputChange}
               required
             />
-            
+
             <button type="submit" disabled={loading}>
               {loading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
             </button>

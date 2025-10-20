@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import cryptoAnalyzer from '../rust-crypto-analyzer';
 import { checkPasswordBreached } from './services/hibp';
-import pool from './db'; 
+import pool from './db';
 
 const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
@@ -57,7 +57,7 @@ app.post('/api/users', async (req: Request, res: Response) => {
     // Password policy check
     const analysis = cryptoAnalyzer.checkPasswordPolicy(password);
     if (!analysis.isCompliant) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Password does not meet security requirements.',
         feedback: analysis.feedback
       });
@@ -70,13 +70,13 @@ app.post('/api/users', async (req: Request, res: Response) => {
     }
 
     const hashedPassword = cryptoAnalyzer.hashPassword(password);
-    
+
     // Insert the new user into the database
     const newUserResult = await pool.query(
       'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, email, name',
       [name, email, hashedPassword]
     );
-    
+
     const newUser = newUserResult.rows[0];
 
     const token = jwt.sign(
@@ -109,7 +109,7 @@ app.post('/login', async (req: Request, res: Response) => {
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const user = result.rows[0];
 
     // Password verification
@@ -117,6 +117,10 @@ app.post('/login', async (req: Request, res: Response) => {
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    // HIBP needs Sha1
+    const sha1 = cryptoAnalyzer.hashPasswordSha1(password);
+    const hibpResult = await checkPasswordBreached(sha1);
 
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name },
@@ -127,7 +131,9 @@ app.post('/login', async (req: Request, res: Response) => {
     res.json({
       message: 'Login successful',
       token,
-      user: { id: user.id, email: user.email, name: user.name }
+      user: { id: user.id, email: user.email, name: user.name },
+      breach: hibpResult.breached,
+      breachCount: hibpResult.count
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -136,9 +142,9 @@ app.post('/login', async (req: Request, res: Response) => {
 });
 
 app.get('/', (req: Request, res: Response) => {
-  res.json({ 
-    message: 'API Server with Authentication!', 
-    timestamp: new Date().toISOString() 
+  res.json({
+    message: 'API Server with Authentication!',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -170,44 +176,54 @@ app.get('/api/users/:id', authenticateToken, async (req: Request, res: Response)
     const { id } = req.params;
     // select specific columns to avoid ever sending back the password hash.
     const result = await pool.query(
-        'SELECT id, name, email, created_at FROM users WHERE id = $1',
-        [id]
+      'SELECT id, name, email, created_at FROM users WHERE id = $1',
+      [id]
     );
 
     if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     res.json({ user: result.rows[0] });
   } catch (error) {
-      console.error(`Error fetching user ${req.params.id}:`, error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error(`Error fetching user ${req.params.id}:`, error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// NEW: HIBP Need to change this so that the frontend isn't passing the password through, should take userid or something and check the database
+// Unused, this is checked in the login route
 app.post('/api/check-breach', async (req: Request, res: Response) => {
   try {
-    const { password } = req.body;
-    
-    if (!password) {
-      return res.status(400).json({ error: 'Password is required' });
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required to check breach status' });
     }
-    
-    // Hash password with SHA-1 in Rust (fast!)
-    const passwordHash = cryptoAnalyzer.hashPasswordSha1(password);
-    
-    // Check against HIBP
-    const result = await checkPasswordBreached(passwordHash);
-    
+
+    // Find the user and verify the provided password matches the stored hash
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const user = result.rows[0];
+
+    const validPassword = cryptoAnalyzer.verifyPasswordHash(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Compute SHA-1 of the raw password (used by HIBP) and check
+    const sha1 = cryptoAnalyzer.hashPasswordSha1(password);
+    const hibpResult = await checkPasswordBreached(sha1);
+
     res.json({
-      breached: result.breached,
-      breachCount: result.count,
-      message: result.breached 
-        ? `This password has been exposed in ${result.count.toLocaleString()} data breaches!`
-        : 'This password has not been found in any known data breaches.'
+      breached: hibpResult.breached,
+      breachCount: hibpResult.count,
+      message: hibpResult.breached
+        ? `This password has been exposed in ${hibpResult.count.toLocaleString()} data breaches`
+        : 'This password has not been found in known data breaches'
     });
-    
+
   } catch (error) {
     console.error('Breach check error:', error);
     res.status(500).json({ error: 'Failed to check breach status' });
