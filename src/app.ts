@@ -79,6 +79,10 @@ app.post('/api/users', async (req: Request, res: Response) => {
 
     const newUser = newUserResult.rows[0];
 
+    // HIBP needs Sha1
+    const sha1 = cryptoAnalyzer.hashPasswordSha1(password);
+    const hibpResult = await checkPasswordBreached(sha1);
+
     const token = jwt.sign(
       { id: newUser.id, email: newUser.email, name: newUser.name },
       JWT_SECRET,
@@ -88,7 +92,9 @@ app.post('/api/users', async (req: Request, res: Response) => {
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: { id: newUser.id, email: newUser.email, name: newUser.name }
+      user: { id: newUser.id, email: newUser.email, name: newUser.name },
+      breach: hibpResult.breached,
+      breachCount: hibpResult.count
     });
   } catch (error) {
     console.error('Registration error:', error);
