@@ -1,6 +1,6 @@
 # Full-Stack Authentication Platform with Rust Integration
 
-A modern full-stack application for user management, including registering and logging in with email + password. Node.js + Express backend with PostgreSQL database and React frontend written in TypeScript, and also featuring high-performance password security analysis and hashing via Rust. Docker containerization included.
+A modern full-stack application for user management, including registering and logging in with email + password. Node.js + Express backend with PostgreSQL database and React frontend written in TypeScript,  also featuring high-performance password security analysis and hashing via Rust, and password breach checking via the HIBP (Have I Been Pwned) API. Docker containerization and orchestration included.
 
 ## Features
 
@@ -11,6 +11,7 @@ A modern full-stack application for user management, including registering and l
   - Argon2 hashing
 - **React Frontend**: Modern UI development with TypeScript
 - **Modern Database**: User data and password hashes secured in PostgreSQL database
+- **Have I Been Pwned**: Cloud service for checking if passwords have been leaked
 - **Production Ready**: CORS, REST, ACID
 
 ## Screenshots
@@ -117,8 +118,7 @@ npm start
 - [ ] Rate limiting with Redis
 - [✓] Docker containerization
 - [ ] SHA for hashing large files using Rust
-- [ ] WebSocket real-time features?
-- [ ] Deploy somewhere?
+- [ ] Deploy to some domain
 
 ## License
 

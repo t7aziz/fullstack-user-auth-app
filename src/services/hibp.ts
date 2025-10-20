@@ -16,7 +16,7 @@ export async function checkPasswordBreached(sha1: string) {
 
         const lines = res.data.split(/\r?\n/);
         const match = lines.find(line => line.startsWith(suffix));
-        console.log(`lines: ${lines}, match: ${match}`);
+        //console.log(`lines: ${lines}, match: ${match}`);
         if (!match) {
             console.log("Breached: false, count: 0");
             return { breached: false, count: 0 };
