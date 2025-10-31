@@ -10,7 +10,7 @@ A modern full-stack application for user management, including registering and l
   - Pattern analysis (repeated characters, sequential patterns, strength scoring)
   - Argon2 hashing
 - **React Frontend**: Modern UI development with TypeScript
-- **Modern Database**: User data and password hashes secured in PostgreSQL database
+- **Modern Database**: User data and password hashes in secure PostgreSQL database
 - **Have I Been Pwned**: Cloud service for checking if passwords have been leaked
 - **Production Ready**: CORS, REST, ACID
 

@@ -30,6 +30,7 @@ rust-crypto-analyzer/**/*.dll
 logs
 *.log
 npm-debug.log*
+target/
 
 # OS-generated files
 .DS_Store
