@@ -18,6 +18,7 @@ COPY rust-crypto-analyzer /usr/src/app/rust-crypto-analyzer
 RUN npm install
 
 # Build the Rust module and the TypeScript server
+RUN cd rust-crypto-analyzer && npm install
 RUN npm run build:rust
 RUN npm run build:server
 
